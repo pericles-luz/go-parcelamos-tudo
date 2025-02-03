@@ -30,3 +30,27 @@ Pela documentação, a criação de uma assinatura é feita através de um POST 
 - `customer` é um objeto contendo `name`, `email`, `document` e `ip`.
 
 Necessita também dos headers `api-version` com o valor `1`, `Content-Type` e `Accept` com o valor `application/json`.
+
+Importante salvar o `id` da assinatura para futuras consultas e cancelamentos
+
+### Remover assinatura
+
+Deve ser usada para cancelar a assinatura de um cliente.
+
+Pela documentação, a remoção de uma assinatura é feita através de um DELETE na rota `/subscriptions/{id}` onde `{id}` é o id da assinatura que se deseja cancelar.
+
+Necessita também dos headers `api-version` com o valor `1`, `Content-Type` e `Accept` com o valor `application/json`.
+
+### Criar Plano
+
+Deve ser usada para cadastrar um novo plano na API da parcelamos tudo.
+
+Pela documentação, a criação de um plano é feita através de um POST na rota `/plans` com o corpo da requisição contendo `name`, `description`, `external_reference_id`, `currency`, `amount`, `period`, `days_until_due`.
+
+- `name` é o nome do plano
+- `description` é a descrição do plano
+- `external_reference_id` é o id usado no seu sistema para identificar o plano
+- `currency` é a moeda do plano e só pode ser `BRL`
+- `amount` é o valor do plano em centavos(`int32`)
+- `period` é o período de cobrança do plano. Pode ser `monthly`, `weekly` ou `yearly`
+- `days_until_due` é o número de dias até o vencimento da cobrança

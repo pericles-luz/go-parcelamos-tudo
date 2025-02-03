@@ -70,8 +70,8 @@ func (a *Authentication) Unmarshal(raw []byte) error {
 	return a.Validate()
 }
 
-func (a *Authentication) ToMap() map[string]string {
-	return map[string]string{
+func (a *Authentication) ToMap() map[string]interface{} {
+	return map[string]interface{}{
 		"grant_type":    a.GrantType,
 		"client_id":     a.ClientID,
 		"client_secret": a.ClientSecret,
