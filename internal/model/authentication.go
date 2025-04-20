@@ -18,6 +18,7 @@ type Authentication struct {
 	ClientID     string   `json:"client_id"`
 	ClientSecret string   `json:"client_secret"`
 	Scopes       []string `json:"scopes"`
+	Link         string   `json:"link"`
 }
 
 func NewAuthentication() *Authentication {

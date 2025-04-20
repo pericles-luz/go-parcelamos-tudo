@@ -6,6 +6,12 @@ import (
 	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
 )
 
+var (
+	ErrMissingEngine      = errors.New("missing rest engine")
+	ErrSubscriptionFailed = errors.New("subscription failed")
+	ErrPlanCreationFailed = errors.New("plan creation failed")
+)
+
 type IResponse interface {
 	GetCode() int
 	GetRaw() string
@@ -20,8 +26,9 @@ type IToken interface {
 }
 
 type IEngine interface {
-	SetToken(token IToken) error
+	SetToken(token *Token) error
 	Post(payload map[string]interface{}, link string) (IResponse, error)
+	PostWithHeaderNoAuth(payload map[string]interface{}, link string, header map[string]string) (IResponse, error)
 	Delete(link string) (IResponse, error)
 }
 
@@ -44,7 +51,7 @@ func (r *Rest) getLink(link string) string {
 	return r.baseLink + link
 }
 
-func (r *Rest) SetToken(token IToken) error {
+func (r *Rest) SetToken(token *Token) error {
 	return r.engine.SetToken(token)
 }
 
@@ -53,9 +60,12 @@ func (r *Rest) Authenticate(auth *model.Authentication) error {
 		return err
 	}
 	if r.engine == nil {
-		return errors.New("missing rest engine")
+		return ErrMissingEngine
 	}
-	response, err := r.engine.Post(auth.ToMap(), r.getLink("/auth/token"))
+	response, err := r.engine.PostWithHeaderNoAuth(auth.ToMap(), r.getLink("/auth/token"), map[string]string{
+		"Accept":       "application/json",
+		"Content-Type": "application/json",
+	})
 	if err != nil {
 		return err
 	}
@@ -69,7 +79,7 @@ func (r *Rest) Authenticate(auth *model.Authentication) error {
 
 func (r *Rest) Subscribe(subscription *model.Subscription) (*model.SubscriptionResponse, error) {
 	if r.engine == nil {
-		return nil, errors.New("missing rest engine")
+		return nil, ErrMissingEngine
 	}
 	if err := subscription.Validate(); err != nil {
 		return nil, err
@@ -79,7 +89,7 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*model.SubscriptionR
 		return nil, err
 	}
 	if response.GetCode() != 201 {
-		return nil, errors.New("subscription failed")
+		return nil, ErrSubscriptionFailed
 	}
 	subscriptionResponse := model.NewSubscriptionResponse()
 	if err := subscriptionResponse.Unmarshal([]byte(response.GetRaw())); err != nil {
@@ -90,14 +100,14 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*model.SubscriptionR
 
 func (r *Rest) Unsubscribe(subscriptionID string) (*model.SubscriptionDeleteResponse, error) {
 	if r.engine == nil {
-		return nil, errors.New("missing rest engine")
+		return nil, ErrMissingEngine
 	}
 	response, err := r.engine.Delete(r.getLink("/subscriptions/" + subscriptionID))
 	if err != nil {
 		return nil, err
 	}
 	if response.GetCode() != 200 {
-		return nil, errors.New("unsubscription failed")
+		return nil, ErrSubscriptionFailed
 	}
 	subscriptionDeleteResponse := model.NewSubscriptionDeleteResponse()
 	if err := subscriptionDeleteResponse.Unmarshal([]byte(response.GetRaw())); err != nil {
@@ -108,7 +118,7 @@ func (r *Rest) Unsubscribe(subscriptionID string) (*model.SubscriptionDeleteResp
 
 func (r *Rest) CreatePlan(plan *model.Plan) (*model.PlanResponse, error) {
 	if r.engine == nil {
-		return nil, errors.New("missing rest engine")
+		return nil, ErrMissingEngine
 	}
 	if err := plan.Validate(); err != nil {
 		return nil, err
@@ -118,7 +128,7 @@ func (r *Rest) CreatePlan(plan *model.Plan) (*model.PlanResponse, error) {
 		return nil, err
 	}
 	if response.GetCode() != 201 {
-		return nil, errors.New("plan creation failed")
+		return nil, ErrPlanCreationFailed
 	}
 	planResponse := model.NewPlanResponse()
 	if err := planResponse.Unmarshal([]byte(response.GetRaw())); err != nil {

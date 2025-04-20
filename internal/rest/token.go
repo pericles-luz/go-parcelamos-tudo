@@ -31,6 +31,9 @@ func (t *Token) IsValid() bool {
 	if len(t.key) == 0 {
 		return false
 	}
+	if t.validity.IsZero() {
+		return false
+	}
 	isValid := time.Now().UTC().Before(t.validity)
 	return isValid
 }
