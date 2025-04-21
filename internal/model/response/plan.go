@@ -1,4 +1,4 @@
-package model
+package response
 
 import (
 	"encoding/json"
@@ -10,26 +10,16 @@ var (
 	ErrIDIsRequired      = errors.New("id is required")
 )
 
-type PlanResponse struct {
+type Plan struct {
 	Success bool   `json:"success"`
 	ID      string `json:"id_plan"`
 }
 
-func NewPlanResponse() *PlanResponse {
-	return &PlanResponse{}
+func NewPlan() *Plan {
+	return &Plan{}
 }
 
-func (p *PlanResponse) SetSuccess(success bool) *PlanResponse {
-	p.Success = success
-	return p
-}
-
-func (p *PlanResponse) SetID(id string) *PlanResponse {
-	p.ID = id
-	return p
-}
-
-func (p *PlanResponse) Validate() error {
+func (p *Plan) Validate() error {
 	if !p.Success {
 		return ErrSuccessIsRequired
 	}
@@ -39,7 +29,7 @@ func (p *PlanResponse) Validate() error {
 	return nil
 }
 
-func (p *PlanResponse) Unmarshal(data []byte) error {
+func (p *Plan) Unmarshal(data []byte) error {
 	err := json.Unmarshal(data, p)
 	if err != nil {
 		return err

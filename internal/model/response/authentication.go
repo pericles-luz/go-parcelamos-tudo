@@ -1,4 +1,4 @@
-package model
+package response
 
 import (
 	"encoding/json"
@@ -11,21 +11,21 @@ var (
 	ErrExpiresInIsRequired   = errors.New("expires_in is required")
 )
 
-type AuthenticationReturn struct {
+type Authentication struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
 	ExpiresIn   int    `json:"expires_in"`
 }
 
-func NewAuthenticationReturn() *AuthenticationReturn {
-	return &AuthenticationReturn{}
+func NewAuthentication() *Authentication {
+	return &Authentication{}
 }
 
-func (a *AuthenticationReturn) Unmarshal(data []byte) error {
+func (a *Authentication) Unmarshal(data []byte) error {
 	return json.Unmarshal(data, a)
 }
 
-func (a *AuthenticationReturn) Validate() error {
+func (a *Authentication) Validate() error {
 	if a.AccessToken == "" {
 		return ErrAccessTokenIsRequired
 	}

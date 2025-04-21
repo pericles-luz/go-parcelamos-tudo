@@ -4,13 +4,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
+	"github.com/pericles-luz/go-parcelamos-tudo/internal/model/response"
 	"github.com/pericles-luz/go-parcelamos-tudo/internal/rest"
 	"github.com/stretchr/testify/require"
 )
 
 func TestTokenMustCreateFromAuthenticationReturn(t *testing.T) {
-	auth := &model.AuthenticationReturn{
+	auth := &response.Authentication{
 		AccessToken: "1234567890",
 		ExpiresIn:   3600,
 	}

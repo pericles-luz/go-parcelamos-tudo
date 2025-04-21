@@ -3,8 +3,10 @@ package rest
 import (
 	"errors"
 	"net/http"
+	"os"
 
 	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
+	"github.com/pericles-luz/go-parcelamos-tudo/internal/model/response"
 )
 
 var (
@@ -40,12 +42,30 @@ type IEngine interface {
 type Rest struct {
 	engine   IEngine
 	baseLink string
+
+	authentication *model.Authentication
 }
 
-func NewRest(engine IEngine) *Rest {
-	return &Rest{
-		engine: engine,
+func NewRest(engine IEngine, credentials string, scope []string) (*Rest, error) {
+	if engine == nil {
+		return nil, ErrMissingEngine
 	}
+	configJSON, err := os.ReadFile(credentials)
+	if err != nil {
+		return nil, err
+	}
+	autentication := model.NewAuthentication()
+	for _, s := range scope {
+		autentication.AddScope(s)
+	}
+	if err := autentication.Unmarshal(configJSON); err != nil {
+		return nil, err
+	}
+	return &Rest{
+		engine:         engine,
+		authentication: autentication,
+		baseLink:       autentication.Link,
+	}, nil
 }
 
 func (r *Rest) SetBaseLink(baseLink string) {
@@ -60,36 +80,36 @@ func (r *Rest) SetToken(token *Token) error {
 	return r.engine.SetToken(token)
 }
 
-func (r *Rest) Authenticate(auth *model.Authentication) error {
+func (r *Rest) Authenticate() error {
 	if r.engine == nil {
 		return ErrMissingEngine
 	}
 	if !r.engine.NeedAutenticate() {
 		return nil
 	}
-	if auth == nil {
+	if r.authentication == nil {
 		return ErrMissingAutenticationData
 	}
-	if err := auth.Validate(); err != nil {
+	if err := r.authentication.Validate(); err != nil {
 		return err
 	}
-	response, err := r.engine.PostWithHeaderNoAuth(auth.ToMap(), r.getLink("/auth/token"), map[string]string{
+	result, err := r.engine.PostWithHeaderNoAuth(r.authentication.ToMap(), r.getLink("/auth/token"), map[string]string{
 		"Accept":       "application/json",
 		"Content-Type": "application/json",
 	})
 	if err != nil {
 		return err
 	}
-	authResponse := model.NewAuthenticationReturn()
-	if err := authResponse.Unmarshal([]byte(response.GetRaw())); err != nil {
+	authenticationResponse := response.NewAuthentication()
+	if err := authenticationResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
 		return err
 	}
-	token := NewToken(authResponse)
+	token := NewToken(authenticationResponse)
 	return r.SetToken(token)
 }
 
-func (r *Rest) Subscribe(subscription *model.Subscription) (*model.SubscriptionResponse, error) {
-	if err := r.Authenticate(nil); err != nil {
+func (r *Rest) Subscribe(subscription *model.Subscription) (*response.Subscription, error) {
+	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
 	if err := subscription.Validate(); err != nil {
@@ -98,54 +118,54 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*model.SubscriptionR
 	if r.engine.NeedAutenticate() {
 		return nil, ErrAuthenticationRequired
 	}
-	response, err := r.engine.Post(subscription.ToMap(), r.getLink("/subscriptions"))
+	result, err := r.engine.Post(subscription.ToMap(), r.getLink("/subscriptions"))
 	if err != nil {
 		return nil, err
 	}
-	if response.GetCode() != http.StatusCreated {
+	if result.GetCode() != http.StatusCreated {
 		return nil, ErrSubscriptionFailed
 	}
-	subscriptionResponse := model.NewSubscriptionResponse()
-	if err := subscriptionResponse.Unmarshal([]byte(response.GetRaw())); err != nil {
+	subscriptionResponse := response.NewSubscription()
+	if err := subscriptionResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
 		return nil, err
 	}
 	return subscriptionResponse, nil
 }
 
-func (r *Rest) Unsubscribe(subscriptionID string) (*model.SubscriptionDeleteResponse, error) {
-	if err := r.Authenticate(nil); err != nil {
+func (r *Rest) Unsubscribe(subscriptionID string) (*response.SubscriptionDelete, error) {
+	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
-	response, err := r.engine.Delete(r.getLink("/subscriptions/" + subscriptionID))
+	result, err := r.engine.Delete(r.getLink("/subscriptions/" + subscriptionID))
 	if err != nil {
 		return nil, err
 	}
-	if response.GetCode() != http.StatusOK {
+	if result.GetCode() != http.StatusOK {
 		return nil, ErrSubscriptionFailed
 	}
-	subscriptionDeleteResponse := model.NewSubscriptionDeleteResponse()
-	if err := subscriptionDeleteResponse.Unmarshal([]byte(response.GetRaw())); err != nil {
+	subscriptionDeleteResponse := response.NewSubscriptionDelete()
+	if err := subscriptionDeleteResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
 		return nil, err
 	}
 	return subscriptionDeleteResponse, nil
 }
 
-func (r *Rest) CreatePlan(plan *model.Plan) (*model.PlanResponse, error) {
-	if err := r.Authenticate(nil); err != nil {
+func (r *Rest) CreatePlan(plan *model.Plan) (*response.Plan, error) {
+	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
 	if err := plan.Validate(); err != nil {
 		return nil, err
 	}
-	response, err := r.engine.Post(plan.ToMap(), r.getLink("/plans"))
+	result, err := r.engine.Post(plan.ToMap(), r.getLink("/plans"))
 	if err != nil {
 		return nil, err
 	}
-	if response.GetCode() != http.StatusCreated {
+	if result.GetCode() != http.StatusCreated {
 		return nil, ErrPlanCreationFailed
 	}
-	planResponse := model.NewPlanResponse()
-	if err := planResponse.Unmarshal([]byte(response.GetRaw())); err != nil {
+	planResponse := response.NewPlan()
+	if err := planResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
 		return nil, err
 	}
 	return planResponse, nil

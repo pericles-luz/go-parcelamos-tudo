@@ -3,7 +3,7 @@ package rest
 import (
 	"time"
 
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
+	"github.com/pericles-luz/go-parcelamos-tudo/internal/model/response"
 )
 
 type Token struct {
@@ -46,7 +46,7 @@ func (t *Token) GetKey() string {
 	return t.key
 }
 
-func NewToken(auth *model.AuthenticationReturn) *Token {
+func NewToken(auth *response.Authentication) *Token {
 	result := &Token{}
 	result.SetKey(auth.AccessToken)
 	result.SetExpiresIn(auth.ExpiresIn)
