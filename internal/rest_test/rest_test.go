@@ -28,10 +28,12 @@ func TestRestAuthenticationShouldWorkWithCredentials(t *testing.T) {
 	require.NoError(t, err, "Failed to read config file")
 	autentication := model.NewAuthentication()
 	autentication.AddScope("subscription.create")
+	autentication.AddScope("subscription.delete")
 	require.NoErrorf(t, autentication.Unmarshal(configJSON), "Failed to unmarshal config file: %v", err)
 	require.NoError(t, autentication.Validate(), "Failed to validate authentication")
 	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
 	rest := rest.NewRest(engine)
 	rest.SetBaseLink(autentication.Link)
+	require.NoError(t, rest.Authenticate(autentication), "Authentication failed")
 	require.NoError(t, rest.Authenticate(autentication), "Authentication failed")
 }

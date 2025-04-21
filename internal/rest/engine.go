@@ -219,6 +219,11 @@ func (e *Engine) preparePayload(payload map[string]interface{}) map[string]strin
 	return result
 }
 
+func (e *Engine) NeedAutenticate() bool {
+	_, err := e.getToken()
+	return err != nil
+}
+
 // gets a Rest struct with the given config
 // if InsecureSkipVerify is set to true, the client will skip the verification of the server's certificate
 func NewEngine(config map[string]interface{}) *Engine {
