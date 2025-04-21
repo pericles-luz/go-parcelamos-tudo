@@ -93,3 +93,15 @@ func TestRestShouldCreateCard(t *testing.T) {
 	require.NoError(t, err, "Failed to create card")
 	require.NotEmpty(t, response.ID, "Card ID is empty")
 }
+
+func TestRestShouldGetCard(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "yes" {
+		t.Skip("Skip test in GitHub Actions")
+	}
+	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
+	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.read"})
+	require.NoError(t, err, "Failed to create rest entity")
+	card, err := restEntity.GetCard("crd_2tGkIfO2nkBjJxAvSWUrAZ3R5X1")
+	require.NoError(t, err, "Failed to get card")
+	require.Equal(t, "crd_test", card.ID, "Card ID is not equal")
+}

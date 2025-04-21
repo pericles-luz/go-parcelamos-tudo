@@ -240,3 +240,22 @@ func (r *Rest) CreateCard(card *model.Card) (*model.Card, error) {
 	}
 	return cardResponse, nil
 }
+
+// scope: card.read
+func (r *Rest) GetCard(cardID string) (*model.Card, error) {
+	if err := r.Authenticate(); err != nil {
+		return nil, err
+	}
+	result, err := r.engine.Get(nil, r.getLink("/api/card/"+cardID))
+	if err != nil {
+		return nil, err
+	}
+	if result.GetCode() != http.StatusOK {
+		return nil, ErrSubscriptionFailed
+	}
+	cardResponse := model.NewCard()
+	if err := cardResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		return nil, err
+	}
+	return cardResponse, nil
+}
