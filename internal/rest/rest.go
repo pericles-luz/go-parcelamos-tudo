@@ -109,6 +109,7 @@ func (r *Rest) Authenticate() error {
 	return r.SetToken(token)
 }
 
+// scope: subscription.create
 func (r *Rest) Subscribe(subscription *model.Subscription) (*response.Subscription, error) {
 	if err := r.Authenticate(); err != nil {
 		return nil, err
@@ -133,6 +134,7 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*response.Subscripti
 	return subscriptionResponse, nil
 }
 
+// scope: subscription.delete
 func (r *Rest) Unsubscribe(subscriptionID string) (*response.SubscriptionDelete, error) {
 	if err := r.Authenticate(); err != nil {
 		return nil, err
@@ -151,6 +153,7 @@ func (r *Rest) Unsubscribe(subscriptionID string) (*response.SubscriptionDelete,
 	return subscriptionDeleteResponse, nil
 }
 
+// scope: plan.create
 func (r *Rest) CreatePlan(plan *model.Plan) (*response.Plan, error) {
 	if err := r.Authenticate(); err != nil {
 		return nil, err
@@ -172,7 +175,8 @@ func (r *Rest) CreatePlan(plan *model.Plan) (*response.Plan, error) {
 	return planResponse, nil
 }
 
-func (r *Rest) PlanList(page, pageSize uint16) (*response.PlanList, error) {
+// scope: plan.search
+func (r *Rest) ListPlan(page, pageSize uint16) (*response.PlanList, error) {
 	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
@@ -194,4 +198,45 @@ func (r *Rest) PlanList(page, pageSize uint16) (*response.PlanList, error) {
 		return nil, err
 	}
 	return planListResponse, nil
+}
+
+// scope: plan.read
+func (r *Rest) GetPlan(planID string) (*response.Plan, error) {
+	if err := r.Authenticate(); err != nil {
+		return nil, err
+	}
+	result, err := r.engine.Get(nil, r.getLink("/api/plan/"+planID))
+	if err != nil {
+		return nil, err
+	}
+	if result.GetCode() != http.StatusOK {
+		return nil, ErrSubscriptionFailed
+	}
+	planResponse := response.NewPlan()
+	if err := planResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		return nil, err
+	}
+	return planResponse, nil
+}
+
+// scope: card.create
+func (r *Rest) CreateCard(card *model.Card) (*model.Card, error) {
+	if err := r.Authenticate(); err != nil {
+		return nil, err
+	}
+	if err := card.Validate(); err != nil {
+		return nil, err
+	}
+	result, err := r.engine.Post(card.ToMap(), r.getLink("/cards"))
+	if err != nil {
+		return nil, err
+	}
+	if result.GetCode() != http.StatusCreated {
+		return nil, ErrSubscriptionFailed
+	}
+	cardResponse := model.NewCard()
+	if err := cardResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		return nil, err
+	}
+	return cardResponse, nil
 }

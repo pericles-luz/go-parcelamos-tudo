@@ -11,8 +11,9 @@ var (
 )
 
 type Plan struct {
-	Success bool   `json:"success"`
-	ID      string `json:"id_plan"`
+	Success    bool   `json:"success"`
+	ID         string `json:"id_plan"`
+	MerchantID string `json:"id_merchant"`
 }
 
 func NewPlan() *Plan {
