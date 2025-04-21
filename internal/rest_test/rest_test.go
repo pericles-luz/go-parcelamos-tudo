@@ -22,7 +22,7 @@ func TestRestAuthenticationShouldWorkWithCredentials(t *testing.T) {
 		t.Skip("Skip test in GitHub Actions")
 	}
 	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create"})
+	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create", "plan.search"})
 	require.NoError(t, err, "Failed to create rest entity")
 	require.NoError(t, restEntity.Authenticate(), "Authentication failed")
 	require.NoError(t, restEntity.Authenticate(), "Second Authentication failed")
@@ -48,4 +48,16 @@ func TestRestShouldCreatePlan(t *testing.T) {
 	require.NoError(t, err, "Failed to create plan")
 	require.True(t, response.Success, "Plan creation failed")
 	t.Log("Plan ID: ", response.ID)
+}
+
+func TestRestShouldListPlan(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "yes" {
+		t.Skip("Skip test in GitHub Actions")
+	}
+	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
+	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.search"})
+	require.NoError(t, err, "Failed to create rest entity")
+	planList, err := restEntity.PlanList(1, 0)
+	require.NoError(t, err, "Failed to list plan")
+	require.True(t, planList.Total > 0, "Plan list is empty")
 }

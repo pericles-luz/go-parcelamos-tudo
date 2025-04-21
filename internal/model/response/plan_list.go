@@ -1,8 +1,10 @@
-package model
+package response
 
 import (
 	"encoding/json"
 	"errors"
+
+	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
 )
 
 var (
@@ -13,10 +15,10 @@ var (
 )
 
 type PlanList struct {
-	Data     []Plan `json:"data"`
-	Page     int    `json:"page"`
-	PageSize int    `json:"page_size"`
-	Total    int    `json:"total"`
+	Data     []model.Plan `json:"data"`
+	Page     int          `json:"page"`
+	PageSize int          `json:"page_size"`
+	Total    int          `json:"total"`
 }
 
 func NewPlanList() *PlanList {

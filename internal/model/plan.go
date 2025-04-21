@@ -11,6 +11,7 @@ var (
 )
 
 type Plan struct {
+	ID                  string `json:"id_plan"`
 	Name                string `json:"name"`
 	Description         string `json:"description"`
 	ExternalReferenceID string `json:"external_reference_id"`

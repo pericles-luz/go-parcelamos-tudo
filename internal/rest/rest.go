@@ -36,6 +36,7 @@ type IEngine interface {
 	NeedAutenticate() bool
 	Post(payload map[string]interface{}, link string) (IResponse, error)
 	PostWithHeaderNoAuth(payload map[string]interface{}, link string, header map[string]string) (IResponse, error)
+	Get(payload map[string]interface{}, link string) (IResponse, error)
 	Delete(link string) (IResponse, error)
 }
 
@@ -169,4 +170,28 @@ func (r *Rest) CreatePlan(plan *model.Plan) (*response.Plan, error) {
 		return nil, err
 	}
 	return planResponse, nil
+}
+
+func (r *Rest) PlanList(page, pageSize uint16) (*response.PlanList, error) {
+	if err := r.Authenticate(); err != nil {
+		return nil, err
+	}
+	if pageSize == 0 {
+		pageSize = 10
+	}
+	result, err := r.engine.Get(map[string]interface{}{
+		"page":      page,
+		"page_size": pageSize,
+	}, r.getLink("/api/plan"))
+	if err != nil {
+		return nil, err
+	}
+	if result.GetCode() != http.StatusOK {
+		return nil, ErrSubscriptionFailed
+	}
+	planListResponse := response.NewPlanList()
+	if err := planListResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		return nil, err
+	}
+	return planListResponse, nil
 }
