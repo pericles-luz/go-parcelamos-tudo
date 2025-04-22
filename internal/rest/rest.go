@@ -120,7 +120,7 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*response.Subscripti
 	if r.engine.NeedAutenticate() {
 		return nil, ErrAuthenticationRequired
 	}
-	result, err := r.engine.Post(subscription.ToMap(), r.getLink("/subscriptions"))
+	result, err := r.engine.Post(subscription.ToMap(), r.getLink("/api/subscription"))
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (r *Rest) Unsubscribe(subscriptionID string) (*response.SubscriptionDelete,
 	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.Delete(r.getLink("/subscriptions/" + subscriptionID))
+	result, err := r.engine.Delete(r.getLink("/api/subscription/" + subscriptionID))
 	if err != nil {
 		return nil, err
 	}
