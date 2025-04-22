@@ -22,7 +22,7 @@ func TestRestAuthenticationShouldWorkWithCredentials(t *testing.T) {
 		t.Skip("Skip test in GitHub Actions")
 	}
 	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create", "plan.search"})
+	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.create", "plan.search"})
 	require.NoError(t, err, "Failed to create rest entity")
 	require.NoError(t, restEntity.Authenticate(), "Authentication failed")
 	require.NoError(t, restEntity.Authenticate(), "Second Authentication failed")
@@ -69,9 +69,9 @@ func TestRestShouldGetPlan(t *testing.T) {
 	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
 	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.read"})
 	require.NoError(t, err, "Failed to create rest entity")
-	readed, err := restEntity.GetPlan("pln_2tGkIfO2nkBjJxAvSWUrAZ3R5X1")
+	readed, err := restEntity.GetPlan("pln_2w5WdzyvPpgFFhgqJSojlMwGZTz")
 	require.NoError(t, err, "Failed to get plan")
-	require.Equal(t, "plid_test", readed.ID, "Plan ID is not equal")
+	require.Equal(t, "pln_2w5WdzyvPpgFFhgqJSojlMwGZTz", readed.ID, "Plan ID is not equal")
 }
 
 func TestRestShouldCreateCard(t *testing.T) {
@@ -82,12 +82,12 @@ func TestRestShouldCreateCard(t *testing.T) {
 	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.create"})
 	require.NoError(t, err, "Failed to create rest entity")
 	card := model.NewCard()
-	card.Number = "4111111111111111"
-	card.ExpirationMonth = "12"
-	card.ExpirationYear = "2025"
-	card.CVV = "123"
+	card.Number = "5147716668261245"
+	card.ExpirationMonth = "07"
+	card.ExpirationYear = "2026"
+	card.CVV = "476"
 	card.Holder.Name = "Test Holder"
-	card.Holder.Document = "12345678901"
+	card.Holder.Document = "00000000191"
 	require.NoError(t, card.Validate(), "Card validation failed")
 	response, err := restEntity.CreateCard(card)
 	require.NoError(t, err, "Failed to create card")

@@ -10,9 +10,11 @@ import (
 )
 
 var (
-	ErrMissingEngine      = errors.New("missing rest engine")
-	ErrSubscriptionFailed = errors.New("subscription failed")
-	ErrPlanCreationFailed = errors.New("plan creation failed")
+	ErrMissingEngine       = errors.New("missing rest engine")
+	ErrSubscriptionFailed  = errors.New("subscription failed")
+	ErrPlanCreationFailed  = errors.New("plan creation failed")
+	ErrCardCreationFailed  = errors.New("card creation failed")
+	ErrCardRetrievalFailed = errors.New("card retrieval failed")
 
 	ErrAuthenticationRequired   = errors.New("authentication required")
 	ErrMissingAutenticationData = errors.New("missing authentication data")
@@ -36,7 +38,9 @@ type IEngine interface {
 	NeedAutenticate() bool
 	Post(payload map[string]interface{}, link string) (IResponse, error)
 	PostWithHeaderNoAuth(payload map[string]interface{}, link string, header map[string]string) (IResponse, error)
+	PostWithHeader(payload map[string]interface{}, link string, header map[string]string) (IResponse, error)
 	Get(payload map[string]interface{}, link string) (IResponse, error)
+	GetWithHeader(payload map[string]interface{}, link string, header map[string]string) (IResponse, error)
 	Delete(link string) (IResponse, error)
 }
 
@@ -161,7 +165,9 @@ func (r *Rest) CreatePlan(plan *model.Plan) (*response.Plan, error) {
 	if err := plan.Validate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.Post(plan.ToMap(), r.getLink("/plans"))
+	result, err := r.engine.PostWithHeader(plan.ToMap(), r.getLink("/api/plan"), map[string]string{
+		"api-version": "1",
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -183,10 +189,13 @@ func (r *Rest) ListPlan(page, pageSize uint16) (*response.PlanList, error) {
 	if pageSize == 0 {
 		pageSize = 10
 	}
-	result, err := r.engine.Get(map[string]interface{}{
+	result, err := r.engine.GetWithHeader(map[string]interface{}{
 		"page":      page,
 		"page_size": pageSize,
-	}, r.getLink("/api/plan"))
+	}, r.getLink("/api/plan"), map[string]string{
+		"api-version": "1",
+		"Accept":      "application/json",
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +214,9 @@ func (r *Rest) GetPlan(planID string) (*response.Plan, error) {
 	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.Get(nil, r.getLink("/api/plan/"+planID))
+	result, err := r.engine.GetWithHeader(nil, r.getLink("/api/plan/"+planID), map[string]string{
+		"api-version": "1",
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -213,6 +224,7 @@ func (r *Rest) GetPlan(planID string) (*response.Plan, error) {
 		return nil, ErrSubscriptionFailed
 	}
 	planResponse := response.NewPlan()
+	planResponse.Success = true
 	if err := planResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
 		return nil, err
 	}
@@ -227,12 +239,14 @@ func (r *Rest) CreateCard(card *model.Card) (*model.Card, error) {
 	if err := card.Validate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.Post(card.ToMap(), r.getLink("/cards"))
+	result, err := r.engine.PostWithHeader(card.ToMap(), r.getLink("/api/card"), map[string]string{
+		"api-version": "1",
+	})
 	if err != nil {
 		return nil, err
 	}
 	if result.GetCode() != http.StatusCreated {
-		return nil, ErrSubscriptionFailed
+		return nil, ErrCardCreationFailed
 	}
 	cardResponse := model.NewCard()
 	if err := cardResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
@@ -246,12 +260,14 @@ func (r *Rest) GetCard(cardID string) (*model.Card, error) {
 	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.Get(nil, r.getLink("/api/card/"+cardID))
+	result, err := r.engine.GetWithHeader(nil, r.getLink("/api/card/"+cardID), map[string]string{
+		"api-version": "1",
+	})
 	if err != nil {
 		return nil, err
 	}
 	if result.GetCode() != http.StatusOK {
-		return nil, ErrSubscriptionFailed
+		return nil, ErrCardRetrievalFailed
 	}
 	cardResponse := model.NewCard()
 	if err := cardResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
