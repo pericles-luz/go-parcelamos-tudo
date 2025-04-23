@@ -12,6 +12,12 @@ var (
 	ErrCardHolderDocumentIsRequired  = errors.New("card holder document is required")
 	ErrCardExpirationMonthIsRequired = errors.New("card expiration month is required")
 	ErrCardExpirationYearIsRequired  = errors.New("card expiration year is required")
+	ErrCardMerchantIDIsRequired      = errors.New("card merchant ID is required")
+	ErrCardBrandIsRequired           = errors.New("card brand is required")
+	ErrCardFirstDigitsIsRequired     = errors.New("card first digits are required")
+	ErrCardLastDigitsIsRequired      = errors.New("card last digits are required")
+	ErrCardValidUntilIsRequired      = errors.New("card valid until is required")
+	ErrCardCreatedAtIsRequired       = errors.New("card created at is required")
 )
 
 type Holder struct {
@@ -45,7 +51,7 @@ func (c *Card) Unmarshal(data []byte) error {
 	if err := json.Unmarshal(data, c); err != nil {
 		return err
 	}
-	return c.Validate()
+	return c.ValidateUnmarshal()
 }
 
 func (c *Card) ToMap() map[string]interface{} {
@@ -77,6 +83,31 @@ func (c *Card) Validate() error {
 	}
 	if c.ExpirationYear == "" {
 		return ErrCardExpirationYearIsRequired
+	}
+	return nil
+}
+
+func (c *Card) ValidateUnmarshal() error {
+	if c.ID == "" {
+		return ErrCardIDIsRequired
+	}
+	if c.MerchantID == "" {
+		return ErrCardMerchantIDIsRequired
+	}
+	if c.Brand == "" {
+		return ErrCardBrandIsRequired
+	}
+	if c.FirstDigits == "" {
+		return ErrCardFirstDigitsIsRequired
+	}
+	if c.LastDigits == "" {
+		return ErrCardLastDigitsIsRequired
+	}
+	if c.ValidUntil == "" {
+		return ErrCardValidUntilIsRequired
+	}
+	if c.CreatedAt == "" {
+		return ErrCardCreatedAtIsRequired
 	}
 	return nil
 }

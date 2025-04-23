@@ -249,6 +249,10 @@ func (r *Rest) CreateCard(card *model.Card) (*model.Card, error) {
 		return nil, ErrCardCreationFailed
 	}
 	cardResponse := model.NewCard()
+	cardResponse.Number = card.Number
+	cardResponse.CVV = card.CVV
+	cardResponse.ExpirationMonth = card.ExpirationMonth
+	cardResponse.ExpirationYear = card.ExpirationYear
 	if err := cardResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
 		return nil, err
 	}
