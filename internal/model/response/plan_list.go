@@ -26,9 +26,6 @@ func NewPlanList() *PlanList {
 }
 
 func (p *PlanList) Validate() error {
-	if p.Data == nil {
-		return ErrDataIsRequired
-	}
 	if p.Page < 0 {
 		return ErrPageIsRequired
 	}
@@ -37,6 +34,12 @@ func (p *PlanList) Validate() error {
 	}
 	if p.Total < 0 {
 		return ErrTotalIsRequired
+	}
+	if p.Total == 0 {
+		return nil
+	}
+	if p.Data == nil {
+		return ErrDataIsRequired
 	}
 	return nil
 }

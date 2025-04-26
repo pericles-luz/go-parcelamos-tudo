@@ -57,12 +57,17 @@ func (c *Customer) Validate() error {
 }
 
 func (c *Customer) ToMap() map[string]interface{} {
-	return map[string]interface{}{
+	result := map[string]interface{}{
 		"name":     c.Name,
-		"email":    c.Email,
 		"document": c.Document,
-		"ip":       c.IP,
 	}
+	if c.Email != "" {
+		result["email"] = c.Email
+	}
+	if c.IP != "" {
+		result["ip"] = c.IP
+	}
+	return result
 }
 
 func (c *Customer) BindFromMap(data map[string]interface{}) error {

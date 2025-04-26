@@ -11,8 +11,8 @@ var (
 )
 
 type Subscription struct {
-	PlanID              string    `json:"plan_id"`
-	CardID              string    `json:"card_id"`
+	PlanID              string    `json:"id_card"`
+	CardID              string    `json:"id_plan"`
 	ChargeType          string    `json:"charge_type"`
 	ExternalReferenceID string    `json:"external_reference_id"`
 	StartDate           string    `json:"start_date"`
@@ -90,15 +90,20 @@ func (s *Subscription) IsPix() bool {
 }
 
 func (s *Subscription) ToMap() map[string]interface{} {
-	return map[string]interface{}{
-		"plan_id":               s.PlanID,
-		"card_id":               s.CardID,
+	result := map[string]interface{}{
+		"id_plan":               s.PlanID,
 		"charge_type":           s.ChargeType,
 		"external_reference_id": s.ExternalReferenceID,
 		"start_date":            s.StartDate,
-		"cycles":                s.Cycles,
 		"customer":              s.Customer.ToMap(),
 	}
+	if s.IsCreditCard() {
+		result["id_card"] = s.CardID
+	}
+	if s.Cycles > 0 {
+		result["cycles"] = s.Cycles
+	}
+	return result
 }
 
 func (s *Subscription) BindFromMap(data map[string]interface{}) error {

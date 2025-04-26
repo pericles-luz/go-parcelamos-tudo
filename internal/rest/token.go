@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pericles-luz/go-parcelamos-tudo/internal/model/response"
@@ -43,6 +44,7 @@ func (t *Token) GetValidity() string {
 }
 
 func (t *Token) GetKey() string {
+	fmt.Println("Token: ", t.key)
 	return t.key
 }
 

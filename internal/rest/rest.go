@@ -2,9 +2,11 @@ package rest
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 
+	"github.com/pericles-luz/go-base/pkg/utils"
 	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
 	"github.com/pericles-luz/go-parcelamos-tudo/internal/model/response"
 )
@@ -124,7 +126,11 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*response.Subscripti
 	if r.engine.NeedAutenticate() {
 		return nil, ErrAuthenticationRequired
 	}
-	result, err := r.engine.Post(subscription.ToMap(), r.getLink("/api/subscription"))
+	fmt.Println("Subscription: ", string(utils.MapInterfaceToBytes(subscription.ToMap())))
+	fmt.Println("Link: ", r.getLink("/api/subscription"))
+	result, err := r.engine.PostWithHeader(subscription.ToMap(), r.getLink("/api/subscription"), map[string]string{
+		"api-version": "1",
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -132,6 +138,7 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*response.Subscripti
 		return nil, ErrSubscriptionFailed
 	}
 	subscriptionResponse := response.NewSubscription()
+	fmt.Println(result.GetRaw())
 	if err := subscriptionResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
 		return nil, err
 	}
@@ -182,17 +189,21 @@ func (r *Rest) CreatePlan(plan *model.Plan) (*response.Plan, error) {
 }
 
 // scope: plan.search
-func (r *Rest) ListPlan(page, pageSize uint16) (*response.PlanList, error) {
+func (r *Rest) ListPlan(page, pageSize uint16, externalID string) (*response.PlanList, error) {
 	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
 	if pageSize == 0 {
 		pageSize = 10
 	}
-	result, err := r.engine.GetWithHeader(map[string]interface{}{
+	params := map[string]interface{}{
 		"page":      page,
 		"page_size": pageSize,
-	}, r.getLink("/api/plan"), map[string]string{
+	}
+	if externalID != "" {
+		params["external_reference_id"] = externalID
+	}
+	result, err := r.engine.GetWithHeader(params, r.getLink("/api/plan"), map[string]string{
 		"api-version": "1",
 		"Accept":      "application/json",
 	})
@@ -215,6 +226,31 @@ func (r *Rest) GetPlan(planID string) (*response.Plan, error) {
 		return nil, err
 	}
 	result, err := r.engine.GetWithHeader(nil, r.getLink("/api/plan/"+planID), map[string]string{
+		"api-version": "1",
+	})
+	if err != nil {
+		return nil, err
+	}
+	if result.GetCode() != http.StatusOK {
+		return nil, ErrSubscriptionFailed
+	}
+	planResponse := response.NewPlan()
+	planResponse.Success = true
+	if err := planResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		return nil, err
+	}
+	return planResponse, nil
+}
+
+// scope: plan.read
+func (r *Rest) GetPlanByExternalID(planID string) (*response.Plan, error) {
+	if err := r.Authenticate(); err != nil {
+		return nil, err
+	}
+	mapping := map[string]interface{}{
+		"external_reference_id": planID,
+	}
+	result, err := r.engine.GetWithHeader(mapping, r.getLink("/api/plan"), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {
