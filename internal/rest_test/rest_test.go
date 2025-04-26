@@ -124,7 +124,7 @@ func TestRestShouldGetCard(t *testing.T) {
 	t.Log("Card: ", card)
 }
 
-func TestRestShoiuldSubscribe(t *testing.T) {
+func TestRestShouldSubscribe(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}

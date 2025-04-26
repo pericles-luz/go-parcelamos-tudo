@@ -16,9 +16,9 @@ type Plan struct {
 	Description         string `json:"description"`
 	ExternalReferenceID string `json:"external_reference_id"`
 	Currency            string `json:"currency"`
-	Amount              uint32 `json:"amount"`
 	Period              string `json:"period"`
-	DaysUntilDue        uint32 `json:"days_until_due"`
+	Amount              uint32 `json:"amount"`
+	DaysUntilDue        uint8  `json:"days_until_due"`
 }
 
 func NewPlan() *Plan {
@@ -58,7 +58,7 @@ func (p *Plan) SetPeriod(period string) *Plan {
 	return p
 }
 
-func (p *Plan) SetDaysUntilDue(daysUntilDue uint32) *Plan {
+func (p *Plan) SetDaysUntilDue(daysUntilDue uint8) *Plan {
 	p.DaysUntilDue = daysUntilDue
 	return p
 }

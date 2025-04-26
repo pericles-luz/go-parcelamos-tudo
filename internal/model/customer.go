@@ -44,14 +44,8 @@ func (c *Customer) Validate() error {
 	if c.Name == "" {
 		return ErrNameIsRequired
 	}
-	if c.Email == "" {
-		return ErrEmailIsRequired
-	}
 	if c.Document == "" {
 		return ErrDocumentIsRequired
-	}
-	if c.IP == "" {
-		return ErrIPIsRequired
 	}
 	return nil
 }

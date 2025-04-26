@@ -47,11 +47,34 @@ func NewCard() *Card {
 	}
 }
 
-func (c *Card) Unmarshal(data []byte) error {
-	if err := json.Unmarshal(data, c); err != nil {
-		return err
-	}
-	return c.ValidateUnmarshal()
+func (c *Card) SetNumber(number string) *Card {
+	c.Number = number
+	return c
+}
+
+func (c *Card) SetCVV(cvv string) *Card {
+	c.CVV = cvv
+	return c
+}
+
+func (c *Card) SetExpirationMonth(month string) *Card {
+	c.ExpirationMonth = month
+	return c
+}
+
+func (c *Card) SetExpirationYear(year string) *Card {
+	c.ExpirationYear = year
+	return c
+}
+
+func (c *Card) SetHolderName(name string) *Card {
+	c.Holder.Name = name
+	return c
+}
+
+func (c *Card) SetHolderDocument(document string) *Card {
+	c.Holder.Document = document
+	return c
 }
 
 func (c *Card) ToMap() map[string]interface{} {
@@ -110,4 +133,11 @@ func (c *Card) ValidateUnmarshal() error {
 		return ErrCardCreatedAtIsRequired
 	}
 	return nil
+}
+
+func (c *Card) Unmarshal(data []byte) error {
+	if err := json.Unmarshal(data, c); err != nil {
+		return err
+	}
+	return c.ValidateUnmarshal()
 }
