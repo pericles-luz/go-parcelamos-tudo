@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model"
 )
 
 var (

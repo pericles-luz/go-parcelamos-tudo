@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model/response"
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/rest"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model/response"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/rest"
 	"github.com/stretchr/testify/require"
 )
 

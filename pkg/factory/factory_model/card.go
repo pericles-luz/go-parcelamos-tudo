@@ -1,6 +1,6 @@
 package factory_model
 
-import "github.com/pericles-luz/go-parcelamos-tudo/internal/model"
+import "github.com/pericles-luz/go-parcelamos-tudo/pkg/model"
 
 func NewCard(number, expirationMonth, expirationYear, cvv, holderName, holderDocument string) *model.Card {
 	result := model.NewCard()

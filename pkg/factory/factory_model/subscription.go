@@ -3,7 +3,7 @@ package factory_model
 import (
 	"time"
 
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model"
 )
 
 func NewSubscriptionWithCard(planID, cardID, customerName, customerDocument string) *model.Subscription {

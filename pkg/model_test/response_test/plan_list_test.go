@@ -3,7 +3,7 @@ package response_test
 import (
 	"testing"
 
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model/response"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model/response"
 	"github.com/stretchr/testify/require"
 )
 

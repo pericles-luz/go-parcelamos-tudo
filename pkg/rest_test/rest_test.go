@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pericles-luz/go-base/pkg/utils"
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/rest"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/rest"
 	"github.com/stretchr/testify/require"
 )
 

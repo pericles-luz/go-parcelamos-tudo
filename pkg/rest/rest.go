@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/pericles-luz/go-base/pkg/utils"
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model/response"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model/response"
 )
 
 var (

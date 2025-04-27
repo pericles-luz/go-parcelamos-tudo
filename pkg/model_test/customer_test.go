@@ -3,7 +3,7 @@ package model_test
 import (
 	"testing"
 
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model"
 	"github.com/stretchr/testify/require"
 )
 

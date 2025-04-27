@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pericles-luz/go-parcelamos-tudo/internal/model/response"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model/response"
 )
 
 type Token struct {
