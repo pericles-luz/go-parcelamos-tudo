@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pericles-luz/go-base/pkg/utils"
+	"github.com/pericles-luz/go-parcelamos-tudo/pkg/factory/factory_client"
 	"github.com/pericles-luz/go-parcelamos-tudo/pkg/model"
 	"github.com/pericles-luz/go-parcelamos-tudo/pkg/rest"
 	"github.com/stretchr/testify/require"
@@ -22,8 +23,7 @@ func TestRestAuthenticationShouldWorkWithCredentials(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.create", "plan.search"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.create", "plan.search"})
 	require.NoError(t, err, "Failed to create rest entity")
 	require.NoError(t, restEntity.Authenticate(), "Authentication failed")
 	require.NoError(t, restEntity.Authenticate(), "Second Authentication failed")
@@ -33,8 +33,7 @@ func TestRestShouldCreatePlan(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.create"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.create"})
 	require.NoError(t, err, "Failed to create rest entity")
 	plan := model.NewPlan()
 	plan.SetName("Test Plan").
@@ -56,8 +55,7 @@ func TestRestShouldListPlan(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.search"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.search"})
 	require.NoError(t, err, "Failed to create rest entity")
 	planList, err := restEntity.ListPlan(1, 0, "")
 	require.NoError(t, err, "Failed to list plan")
@@ -68,8 +66,7 @@ func TestRestShouldGetPlan(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.read"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.read"})
 	require.NoError(t, err, "Failed to create rest entity")
 	readed, err := restEntity.GetPlan("pln_2w5WdzyvPpgFFhgqJSojlMwGZTz")
 	require.NoError(t, err, "Failed to get plan")
@@ -80,8 +77,7 @@ func TestRestShouldGetPlanByExternalID(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.search"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.search"})
 	require.NoError(t, err, "Failed to create rest entity")
 	readed, err := restEntity.ListPlan(1, 0, "87ce217c-b881-4c0e-b199-d93a88787e73")
 	require.NoError(t, err, "Failed to get plan")
@@ -93,8 +89,7 @@ func TestRestShouldCreateCard(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.create"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.create"})
 	require.NoError(t, err, "Failed to create rest entity")
 	card := model.NewCard()
 	card.Number = "4761120000000148"
@@ -115,8 +110,7 @@ func TestRestShouldGetCard(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.read"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.read"})
 	require.NoError(t, err, "Failed to create rest entity")
 	card, err := restEntity.GetCard("crd_2w6QqYlyqkdOgs4BzcmLb9GiG92")
 	require.NoError(t, err, "Failed to get card")
@@ -128,8 +122,7 @@ func TestRestShouldSubscribe(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	engine := rest.NewEngine(map[string]interface{}{"InsecureSkipVerify": true})
-	restEntity, err := rest.NewRest(engine, utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create"})
 	require.NoError(t, err, "Failed to create rest entity")
 	subscription := model.NewSubscription()
 	subscription.PlanID = "pln_2w5WdzyvPpgFFhgqJSojlMwGZTz"
