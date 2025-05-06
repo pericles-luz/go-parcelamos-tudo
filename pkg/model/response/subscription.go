@@ -32,7 +32,7 @@ type Subscription struct {
 		ID            string `json:"id_invoice"`
 		Status        string `json:"status"`
 		ReferenceDate string `json:"reference_date"`
-		ChargeIntent  string `json:"charge_intent"`
+		ChargeIntent  int    `json:"charge_intent"`
 	} `json:"next_invoice"`
 }
 

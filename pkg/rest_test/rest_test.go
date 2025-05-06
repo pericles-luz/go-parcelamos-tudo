@@ -79,10 +79,10 @@ func TestRestShouldGetPlanByExternalID(t *testing.T) {
 	}
 	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"plan.search"})
 	require.NoError(t, err, "Failed to create rest entity")
-	readed, err := restEntity.ListPlan(1, 0, "87ce217c-b881-4c0e-b199-d93a88787e73")
+	readed, err := restEntity.ListPlan(1, 0, "38e67a33-dcd1-4d96-89cf-906a0700c479")
 	require.NoError(t, err, "Failed to get plan")
 	require.Len(t, readed.Data, 1, "Plan list is empty")
-	require.Equal(t, "pln_2w5WdzyvPpgFFhgqJSojlMwGZTz", readed.Data[0].ID, "Plan ID is not equal")
+	require.Equal(t, "pln_2wNMJaot9NT0rfbpSFqYsc1vDgm", readed.Data[0].ID, "Plan ID is not equal")
 }
 
 func TestRestShouldCreateCard(t *testing.T) {
@@ -125,7 +125,7 @@ func TestRestShouldSubscribe(t *testing.T) {
 	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create"})
 	require.NoError(t, err, "Failed to create rest entity")
 	subscription := model.NewSubscription()
-	subscription.PlanID = "pln_2w5WdzyvPpgFFhgqJSojlMwGZTz"
+	subscription.PlanID = "pln_2wNMJaot9NT0rfbpSFqYsc1vDgm"
 	subscription.ChargeType = "credit_card"
 	subscription.CardID = "crd_2w6QqYlyqkdOgs4BzcmLb9GiG92"
 	subscription.ExternalReferenceID = uuid.NewString()

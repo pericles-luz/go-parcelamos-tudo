@@ -72,6 +72,7 @@ func (p *Plan) ToMap() map[string]interface{} {
 		"amount":                p.Amount,
 		"period":                p.Period,
 		"days_until_due":        p.DaysUntilDue,
+		"splits":                []map[string]interface{}{},
 	}
 }
 
