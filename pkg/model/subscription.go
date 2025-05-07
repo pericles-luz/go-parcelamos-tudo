@@ -1,6 +1,9 @@
 package model
 
-import "errors"
+import (
+	"encoding/json"
+	"errors"
+)
 
 var (
 	ErrPlanIDIsRequired     = errors.New("plan_id is required")
@@ -131,6 +134,13 @@ func (s *Subscription) BindFromMap(data map[string]interface{}) error {
 			return err
 		}
 		s.Customer = customer
+	}
+	return s.Validate()
+}
+
+func (s *Subscription) Unmarshal(data []byte) error {
+	if err := json.Unmarshal(data, s); err != nil {
+		return err
 	}
 	return s.Validate()
 }

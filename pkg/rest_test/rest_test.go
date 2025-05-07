@@ -106,6 +106,27 @@ func TestRestShouldCreateCard(t *testing.T) {
 	t.Log("Card: ", response)
 }
 
+func TestRestShouldFailCreatingCard(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "yes" {
+		t.Skip("Skip test in GitHub Actions")
+	}
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"card.create"})
+	require.NoError(t, err, "Failed to create rest entity")
+	card := model.NewCard()
+	card.Number = "5378214635582554"
+	card.ExpirationMonth = "07"
+	card.ExpirationYear = "2026"
+	card.CVV = "476"
+	card.Holder.Name = "Test Holder"
+	card.Holder.Document = "00000000191"
+	require.NoError(t, card.Validate(), "Card validation failed")
+	response, err := restEntity.CreateCard(card)
+	require.Error(t, err, "Expected error when creating card")
+	require.Nil(t, response, "Card ID should be empty on failure")
+	t.Log("Expected failure while creating card")
+	t.Log("Card: ", response)
+}
+
 func TestRestShouldGetCard(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
@@ -145,4 +166,16 @@ func TestRestShouldSubscribe(t *testing.T) {
 	require.Equal(t, subscription.ChargeType, response.Subscription.ChargeType, "Subscription Charge Type is not equal")
 	require.Equal(t, subscription.CardID, response.Subscription.CardID, "Subscription Card ID is not equal")
 	require.Equal(t, subscription.ExternalReferenceID, response.Subscription.ExternalReferenceID, "Subscription External Reference ID is not equal")
+}
+
+func TestRestShouldGetSubscription(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "yes" {
+		t.Skip("Skip test in GitHub Actions")
+	}
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.read"})
+	require.NoError(t, err, "Failed to create rest entity")
+	response, err := restEntity.GetSubscription("sub_2wlNFLfTy9gGjEgqhFEzwoQhI8n")
+	require.NoError(t, err, "Failed to get subscription")
+	require.NotEmpty(t, response.PlanID, "Subscription PlanID is empty")
+	t.Log("Subscription: ", response)
 }

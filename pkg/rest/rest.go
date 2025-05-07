@@ -20,6 +20,7 @@ var (
 
 	ErrAuthenticationRequired   = errors.New("authentication required")
 	ErrMissingAutenticationData = errors.New("missing authentication data")
+	ErrSubscriptionIDIsRequired = errors.New("subscription id is required")
 )
 
 type IResponse interface {
@@ -143,6 +144,30 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*response.Subscripti
 		return nil, err
 	}
 	return subscriptionResponse, nil
+}
+
+// scope: subscription.read
+func (r *Rest) GetSubscription(subscriptionID string) (*model.Subscription, error) {
+	if err := r.Authenticate(); err != nil {
+		return nil, err
+	}
+	if subscriptionID == "" {
+		return nil, ErrSubscriptionIDIsRequired
+	}
+	result, err := r.engine.GetWithHeader(nil, r.getLink("/api/subscription/"+subscriptionID), map[string]string{
+		"api-version": "1",
+	})
+	if err != nil {
+		return nil, err
+	}
+	if result.GetCode() != http.StatusOK {
+		return nil, ErrSubscriptionFailed
+	}
+	subscription := model.NewSubscription()
+	if err := subscription.Unmarshal([]byte(result.GetRaw())); err != nil && !errors.Is(err, model.ErrCustomerIsRequired) {
+		return nil, err
+	}
+	return subscription, nil
 }
 
 // scope: subscription.delete
