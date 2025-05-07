@@ -13,7 +13,6 @@ Funcionalidades implementadas:
 
 ### Autenticação
 
-Chama a API da parcelamos tudo para autenticar o usuário e obter o token de acesso.
 Para autenticação e utilização, basta criar um arquivo `json` como o abaixo e passar seu path como parâmetro ao criar o cliente.
 
 
