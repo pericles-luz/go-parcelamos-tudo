@@ -139,11 +139,11 @@ func TestRestShouldGetCard(t *testing.T) {
 	t.Log("Card: ", card)
 }
 
-func TestRestShouldSubscribe(t *testing.T) {
+func TestRestShouldSubscribeAndUnsubscribe(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create", "subscription.delete"})
 	require.NoError(t, err, "Failed to create rest entity")
 	subscription := model.NewSubscription()
 	subscription.PlanID = "pln_2wNMJaot9NT0rfbpSFqYsc1vDgm"
@@ -166,6 +166,10 @@ func TestRestShouldSubscribe(t *testing.T) {
 	require.Equal(t, subscription.ChargeType, response.Subscription.ChargeType, "Subscription Charge Type is not equal")
 	require.Equal(t, subscription.CardID, response.Subscription.CardID, "Subscription Card ID is not equal")
 	require.Equal(t, subscription.ExternalReferenceID, response.Subscription.ExternalReferenceID, "Subscription External Reference ID is not equal")
+	unsubscription, err := restEntity.Unsubscribe(response.Subscription.ID)
+	require.NoError(t, err, "Failed to unsubscribe")
+	require.True(t, unsubscription.Success, "Unsubscription failed")
+	t.Log("Unsubscribed Subscription: ", unsubscription)
 }
 
 func TestRestShouldGetSubscription(t *testing.T) {
@@ -178,4 +182,16 @@ func TestRestShouldGetSubscription(t *testing.T) {
 	require.NoError(t, err, "Failed to get subscription")
 	require.NotEmpty(t, response.PlanID, "Subscription PlanID is empty")
 	t.Log("Subscription: ", response)
+}
+
+func TestRestShouldUnsubscription(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "yes" {
+		t.Skip("Skip test in GitHub Actions")
+	}
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.delete"})
+	require.NoError(t, err, "Failed to create rest entity")
+	response, err := restEntity.Unsubscribe("sub_2wofmq65s8rdPeGAk3XAvKBWlQR")
+	require.NoError(t, err, "Failed to unsubscribe")
+	require.True(t, response.Success, "Subscription ID is empty")
+	t.Log("Unsubscribed Subscription: ", response)
 }

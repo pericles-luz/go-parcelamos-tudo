@@ -45,6 +45,7 @@ type IEngine interface {
 	Get(payload map[string]interface{}, link string) (IResponse, error)
 	GetWithHeader(payload map[string]interface{}, link string, header map[string]string) (IResponse, error)
 	Delete(link string) (IResponse, error)
+	DeleteWithHeader(link string, header map[string]string) (IResponse, error)
 }
 
 type Rest struct {
@@ -175,7 +176,9 @@ func (r *Rest) Unsubscribe(subscriptionID string) (*response.SubscriptionDelete,
 	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.Delete(r.getLink("/api/subscription/" + subscriptionID))
+	result, err := r.engine.DeleteWithHeader(r.getLink("/api/subscription/"+subscriptionID), map[string]string{
+		"api-version": "1",
+	})
 	if err != nil {
 		return nil, err
 	}

@@ -200,6 +200,23 @@ func (e *Engine) Delete(link string) (IResponse, error) {
 	}, nil
 }
 
+// deletes request to the given link, using the defined token and specific header
+func (e *Engine) DeleteWithHeader(link string, header map[string]string) (IResponse, error) {
+	token, err := e.getToken()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := e.getHttp().R().SetHeaders(header).SetAuthToken(token.GetKey()).Delete(link)
+	if err != nil {
+		return nil, err
+	}
+	resp.Time()
+	return &Response{
+		code: resp.StatusCode(),
+		raw:  resp.String(),
+	}, nil
+}
+
 func (e *Engine) preparePayload(payload map[string]interface{}) map[string]string {
 	result := map[string]string{}
 	for k, v := range payload {
