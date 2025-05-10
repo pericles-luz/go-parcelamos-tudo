@@ -15,6 +15,7 @@ var (
 	ErrMissingEngine       = errors.New("missing rest engine")
 	ErrSubscriptionFailed  = errors.New("subscription failed")
 	ErrPlanCreationFailed  = errors.New("plan creation failed")
+	ErrPlanNotFound        = errors.New("plan not found")
 	ErrCardCreationFailed  = errors.New("card creation failed")
 	ErrCardRetrievalFailed = errors.New("card retrieval failed")
 
@@ -287,11 +288,19 @@ func (r *Rest) GetPlanByExternalID(planID string) (*response.Plan, error) {
 	if result.GetCode() != http.StatusOK {
 		return nil, ErrSubscriptionFailed
 	}
-	planResponse := response.NewPlan()
-	planResponse.Success = true
-	if err := planResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+	planList := response.NewPlanList()
+	if err := planList.Unmarshal([]byte(result.GetRaw())); err != nil {
 		return nil, err
 	}
+	if len(planList.Data) == 0 {
+		return nil, ErrPlanNotFound
+	}
+	if len(planList.Data) > 1 {
+		return nil, ErrPlanNotFound
+	}
+	planResponse := response.NewPlan()
+	planResponse.Success = true
+	planResponse.ID = planList.Data[0].ID
 	return planResponse, nil
 }
 
