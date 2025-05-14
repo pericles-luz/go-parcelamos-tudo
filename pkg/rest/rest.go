@@ -352,3 +352,27 @@ func (r *Rest) GetCard(cardID string) (*model.Card, error) {
 	}
 	return cardResponse, nil
 }
+
+// scope: webhook.create
+func (r *Rest) CreateWebhook(webhook *model.Webhook) (*response.Webhook, error) {
+	if err := r.Authenticate(); err != nil {
+		return nil, err
+	}
+	if err := webhook.Validate(); err != nil {
+		return nil, err
+	}
+	result, err := r.engine.PostWithHeader(webhook.ToAPI(), r.getLink("/api/webhook"), map[string]string{
+		"api-version": "1",
+	})
+	if err != nil {
+		return nil, err
+	}
+	if result.GetCode() != http.StatusCreated {
+		return nil, ErrSubscriptionFailed
+	}
+	webhookResponse := response.NewWebhook()
+	if err := webhookResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		return nil, err
+	}
+	return webhookResponse, nil
+}

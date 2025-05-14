@@ -195,3 +195,25 @@ func TestRestShouldUnsubscription(t *testing.T) {
 	require.True(t, response.Success, "Subscription ID is empty")
 	t.Log("Unsubscribed Subscription: ", response)
 }
+
+func TestRestShouldCreateWebhook(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "yes" {
+		t.Skip("Skip test in GitHub Actions")
+	}
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"webhook.create"})
+	require.NoError(t, err, "Failed to create rest entity")
+	webhook := model.NewWebhook()
+	webhook.SetContextName("subscription").
+		SetEventName("subscription.created").
+		SetURL("https://example.com/webhook").
+		SetPrivateKey("private_key")
+	require.NoError(t, webhook.Validate(), "Webhook validation failed")
+	response, err := restEntity.CreateWebhook(webhook)
+	require.NoError(t, err, "Failed to create webhook")
+	require.NoError(t, response.Validate(), "Webhook validation failed")
+	t.Log("Webhook", response)
+	require.Equal(t, webhook.ContextName, response.ContextName, "Webhook Context Name is not equal")
+	require.Equal(t, webhook.EventName, response.EventName, "Webhook Event Name is not equal")
+	require.Equal(t, webhook.URL, response.URL, "Webhook URL is not equal")
+	require.Equal(t, webhook.PrivateKey, response.PrivateKey, "Webhook Private Key is not equal")
+}
