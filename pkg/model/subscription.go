@@ -67,11 +67,11 @@ func (s *Subscription) Validate() error {
 		return ErrPlanIDIsRequired
 	}
 
-	if !s.IsCreditCard() && !s.IsPix() {
+	if !s.IsCreditCard() && !s.IsPix() && !s.IsDebitCard() {
 		return ErrChargeTypeIsRequired
 	}
 
-	if s.IsCreditCard() && s.CardID == "" {
+	if (s.IsCreditCard() || s.IsDebitCard()) && s.CardID == "" {
 		return ErrCardIDIsRequired
 	}
 
@@ -88,6 +88,10 @@ func (s *Subscription) IsCreditCard() bool {
 	return s.ChargeType == "credit_card"
 }
 
+func (s *Subscription) IsDebitCard() bool {
+	return s.ChargeType == "debit_card"
+}
+
 func (s *Subscription) IsPix() bool {
 	return s.ChargeType == "pix"
 }
@@ -100,7 +104,7 @@ func (s *Subscription) ToMap() map[string]interface{} {
 		"start_date":            s.StartDate,
 		"customer":              s.Customer.ToMap(),
 	}
-	if s.IsCreditCard() {
+	if s.IsCreditCard() || s.IsDebitCard() {
 		result["id_card"] = s.CardID
 	}
 	if s.Cycles > 0 {

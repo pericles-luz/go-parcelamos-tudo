@@ -172,6 +172,72 @@ func TestRestShouldSubscribeAndUnsubscribe(t *testing.T) {
 	t.Log("Unsubscribed Subscription: ", unsubscription)
 }
 
+func TestRestShouldSubscribeWithPixAndUnsubscribe(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "yes" {
+		t.Skip("Skip test in GitHub Actions")
+	}
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create", "subscription.delete"})
+	require.NoError(t, err, "Failed to create rest entity")
+	subscription := model.NewSubscription()
+	subscription.PlanID = "pln_2wNMJaot9NT0rfbpSFqYsc1vDgm"
+	subscription.ChargeType = "pix"
+	subscription.ExternalReferenceID = uuid.NewString()
+	subscription.StartDate = time.Now().Format("2006-01-02")
+	subscription.Cycles = 0
+	customer := model.NewCustomer()
+	customer.Name = "Test Customer"
+	customer.Document = "80205365078"
+	customer.Email = "pericles.luz@gmail.com"
+	subscription.Customer = customer
+	require.NoError(t, subscription.Validate(), "Subscription validation failed")
+	response, err := restEntity.Subscribe(subscription)
+	require.NoError(t, err, "Failed to create subscription")
+	require.NotEmpty(t, response.Subscription.ID, "Subscription ID is empty")
+	t.Log("Subscription ID: ", response.Subscription.ID)
+	t.Log("Subscription: ", response)
+	require.Equal(t, subscription.PlanID, response.Subscription.PlanID, "Subscription Plan ID is not equal")
+	require.Equal(t, subscription.ChargeType, response.Subscription.ChargeType, "Subscription Charge Type is not equal")
+	require.Equal(t, subscription.CardID, response.Subscription.CardID, "Subscription Card ID is not equal")
+	require.Equal(t, subscription.ExternalReferenceID, response.Subscription.ExternalReferenceID, "Subscription External Reference ID is not equal")
+	unsubscription, err := restEntity.Unsubscribe(response.Subscription.ID)
+	require.NoError(t, err, "Failed to unsubscribe")
+	require.True(t, unsubscription.Success, "Unsubscription failed")
+	t.Log("Unsubscribed Subscription: ", unsubscription)
+}
+
+func TestRestShouldSubscribeWithDebitCardAndUnsubscribe(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "yes" {
+		t.Skip("Skip test in GitHub Actions")
+	}
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.create", "subscription.delete"})
+	require.NoError(t, err, "Failed to create rest entity")
+	subscription := model.NewSubscription()
+	subscription.PlanID = "pln_2wNMJaot9NT0rfbpSFqYsc1vDgm"
+	subscription.ChargeType = "debit_card"
+	subscription.CardID = "crd_2w6QqYlyqkdOgs4BzcmLb9GiG92"
+	subscription.ExternalReferenceID = uuid.NewString()
+	subscription.StartDate = time.Now().AddDate(0, 0, 1).Format("2006-01-02")
+	subscription.Cycles = 0
+	customer := model.NewCustomer()
+	customer.Name = "Test Customer"
+	customer.Document = "00000000191"
+	subscription.Customer = customer
+	require.NoError(t, subscription.Validate(), "Subscription validation failed")
+	response, err := restEntity.Subscribe(subscription)
+	require.NoError(t, err, "Failed to create subscription")
+	require.NotEmpty(t, response.Subscription.ID, "Subscription ID is empty")
+	t.Log("Subscription ID: ", response.Subscription.ID)
+	t.Log("Subscription: ", response)
+	require.Equal(t, subscription.PlanID, response.Subscription.PlanID, "Subscription Plan ID is not equal")
+	require.Equal(t, subscription.ChargeType, response.Subscription.ChargeType, "Subscription Charge Type is not equal")
+	require.Equal(t, subscription.CardID, response.Subscription.CardID, "Subscription Card ID is not equal")
+	require.Equal(t, subscription.ExternalReferenceID, response.Subscription.ExternalReferenceID, "Subscription External Reference ID is not equal")
+	unsubscription, err := restEntity.Unsubscribe(response.Subscription.ID)
+	require.NoError(t, err, "Failed to unsubscribe")
+	require.True(t, unsubscription.Success, "Unsubscription failed")
+	t.Log("Unsubscribed Subscription: ", unsubscription)
+}
+
 func TestRestShouldGetSubscription(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
@@ -190,7 +256,7 @@ func TestRestShouldUnsubscription(t *testing.T) {
 	}
 	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.delete"})
 	require.NoError(t, err, "Failed to create rest entity")
-	response, err := restEntity.Unsubscribe("sub_2wofmq65s8rdPeGAk3XAvKBWlQR")
+	response, err := restEntity.Unsubscribe("sub_2xEAkPMvr7GpROsp5VdVVZiWFWS")
 	require.NoError(t, err, "Failed to unsubscribe")
 	require.True(t, response.Success, "Subscription ID is empty")
 	t.Log("Unsubscribed Subscription: ", response)
@@ -203,9 +269,9 @@ func TestRestShouldCreateWebhook(t *testing.T) {
 	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"webhook.create"})
 	require.NoError(t, err, "Failed to create rest entity")
 	webhook := model.NewWebhook()
-	webhook.SetContextName("subscription").
-		SetEventName("subscription.created").
-		SetURL("https://example.com/webhook").
+	webhook.SetContextName("plan").
+		SetEventName("plan.created").
+		SetURL("https://example.com/plan").
 		SetPrivateKey("private_key")
 	require.NoError(t, webhook.Validate(), "Webhook validation failed")
 	response, err := restEntity.CreateWebhook(webhook)
