@@ -90,6 +90,15 @@ func (r *Rest) SetToken(token *Token) error {
 	return r.engine.SetToken(token)
 }
 
+func (r *Rest) showResponse(result IResponse) {
+	if result == nil {
+		fmt.Println("Result is nil")
+		return
+	}
+	fmt.Println("Code: ", result.GetCode())
+	fmt.Println("Raw: ", result.GetRaw())
+}
+
 func (r *Rest) Authenticate() error {
 	if r.engine == nil {
 		return ErrMissingEngine
@@ -108,10 +117,13 @@ func (r *Rest) Authenticate() error {
 		"Content-Type": "application/json",
 	})
 	if err != nil {
+		fmt.Println("Error: ", err)
 		return err
 	}
 	authenticationResponse := response.NewAuthentication()
 	if err := authenticationResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return err
 	}
 	token := NewToken(authenticationResponse)
@@ -138,11 +150,13 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*response.Subscripti
 		return nil, err
 	}
 	if result.GetCode() != http.StatusCreated {
+		r.showResponse(result)
 		return nil, ErrSubscriptionFailed
 	}
 	subscriptionResponse := response.NewSubscription()
-	fmt.Println(result.GetRaw())
 	if err := subscriptionResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	return subscriptionResponse, nil
@@ -160,13 +174,18 @@ func (r *Rest) GetSubscription(subscriptionID string) (*model.Subscription, erro
 		"api-version": "1",
 	})
 	if err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if result.GetCode() != http.StatusOK {
+		r.showResponse(result)
 		return nil, ErrSubscriptionFailed
 	}
 	subscription := model.NewSubscription()
 	if err := subscription.Unmarshal([]byte(result.GetRaw())); err != nil && !errors.Is(err, model.ErrCustomerIsRequired) {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	return subscription, nil
@@ -181,13 +200,18 @@ func (r *Rest) Unsubscribe(subscriptionID string) (*response.SubscriptionDelete,
 		"api-version": "1",
 	})
 	if err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if result.GetCode() != http.StatusOK {
+		r.showResponse(result)
 		return nil, ErrSubscriptionFailed
 	}
 	subscriptionDeleteResponse := response.NewSubscriptionDelete()
 	if err := subscriptionDeleteResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	return subscriptionDeleteResponse, nil
@@ -205,13 +229,18 @@ func (r *Rest) CreatePlan(plan *model.Plan) (*response.Plan, error) {
 		"api-version": "1",
 	})
 	if err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if result.GetCode() != http.StatusCreated {
+		r.showResponse(result)
 		return nil, ErrPlanCreationFailed
 	}
 	planResponse := response.NewPlan()
 	if err := planResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	return planResponse, nil
@@ -237,13 +266,18 @@ func (r *Rest) ListPlan(page, pageSize uint16, externalID string) (*response.Pla
 		"Accept":      "application/json",
 	})
 	if err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if result.GetCode() != http.StatusOK {
+		r.showResponse(result)
 		return nil, ErrSubscriptionFailed
 	}
 	planListResponse := response.NewPlanList()
 	if err := planListResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	return planListResponse, nil
@@ -258,14 +292,19 @@ func (r *Rest) GetPlan(planID string) (*response.Plan, error) {
 		"api-version": "1",
 	})
 	if err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if result.GetCode() != http.StatusOK {
+		r.showResponse(result)
 		return nil, ErrSubscriptionFailed
 	}
 	planResponse := response.NewPlan()
 	planResponse.Success = true
 	if err := planResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	return planResponse, nil
@@ -283,13 +322,18 @@ func (r *Rest) GetPlanByExternalID(planID string) (*response.Plan, error) {
 		"api-version": "1",
 	})
 	if err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if result.GetCode() != http.StatusOK {
+		r.showResponse(result)
 		return nil, ErrSubscriptionFailed
 	}
 	planList := response.NewPlanList()
 	if err := planList.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if len(planList.Data) == 0 {
@@ -316,9 +360,12 @@ func (r *Rest) CreateCard(card *model.Card) (*model.Card, error) {
 		"api-version": "1",
 	})
 	if err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if result.GetCode() != http.StatusCreated {
+		r.showResponse(result)
 		return nil, ErrCardCreationFailed
 	}
 	cardResponse := model.NewCard()
@@ -327,6 +374,8 @@ func (r *Rest) CreateCard(card *model.Card) (*model.Card, error) {
 	cardResponse.ExpirationMonth = card.ExpirationMonth
 	cardResponse.ExpirationYear = card.ExpirationYear
 	if err := cardResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	return cardResponse, nil
@@ -341,13 +390,18 @@ func (r *Rest) GetCard(cardID string) (*model.Card, error) {
 		"api-version": "1",
 	})
 	if err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if result.GetCode() != http.StatusOK {
+		r.showResponse(result)
 		return nil, ErrCardRetrievalFailed
 	}
 	cardResponse := model.NewCard()
 	if err := cardResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	return cardResponse, nil
@@ -365,13 +419,18 @@ func (r *Rest) CreateWebhook(webhook *model.Webhook) (*response.Webhook, error) 
 		"api-version": "1",
 	})
 	if err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	if result.GetCode() != http.StatusCreated {
+		r.showResponse(result)
 		return nil, ErrSubscriptionFailed
 	}
 	webhookResponse := response.NewWebhook()
 	if err := webhookResponse.Unmarshal([]byte(result.GetRaw())); err != nil {
+		r.showResponse(result)
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 	return webhookResponse, nil
