@@ -14,8 +14,8 @@ var (
 )
 
 type Subscription struct {
-	PlanID              string    `json:"id_card"`
-	CardID              string    `json:"id_plan"`
+	PlanID              string    `json:"id_plan"`
+	CardID              string    `json:"id_card"`
 	ChargeType          string    `json:"charge_type"`
 	ExternalReferenceID string    `json:"external_reference_id"`
 	StartDate           string    `json:"start_date"`
