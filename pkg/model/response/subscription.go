@@ -3,6 +3,7 @@ package response
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 var (
@@ -55,4 +56,15 @@ func (s *Subscription) Validate() error {
 		return ErrSubscriptionIDIsRequired
 	}
 	return nil
+}
+
+func (s *Subscription) PixLink(production bool) string {
+	if s.NextInvoice.ID == "" {
+		return ""
+	}
+	baseLink := "sandbox.pay.parcelamostudo.com.br"
+	if production {
+		baseLink = "pay.parcelamostudo.com.br"
+	}
+	return fmt.Sprintf("https://%s/invoice/%s/pix", baseLink, s.NextInvoice.ID)
 }

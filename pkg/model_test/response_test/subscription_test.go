@@ -36,3 +36,10 @@ func TestSubscriptionMustUnmarshal(t *testing.T) {
 	require.Equal(t, "sub_2wk97XjFXOiTAoOYNvjgsEHtlVA", subscription.Subscription.ID)
 	require.Equal(t, 0, subscription.Subscription.CyclesDone)
 }
+
+func TestSubscriptionShouldGeneratePixLink(t *testing.T) {
+	subscription := response.NewSubscription()
+	subscription.NextInvoice.ID = "inv_2wk97ZbyBA9qC7DgYzvyWJfYNlT"
+	require.Equal(t, "https://sandbox.pay.parcelamostudo.com.br/invoice/inv_2wk97ZbyBA9qC7DgYzvyWJfYNlT/pix", subscription.PixLink(false))
+	require.Equal(t, "https://pay.parcelamostudo.com.br/invoice/inv_2wk97ZbyBA9qC7DgYzvyWJfYNlT/pix", subscription.PixLink(true))
+}
