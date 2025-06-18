@@ -82,7 +82,7 @@ func (r *Rest) SetBaseLink(baseLink string) {
 	r.baseLink = baseLink
 }
 
-func (r *Rest) getLink(link string) string {
+func (r *Rest) GetLink(link string) string {
 	return r.baseLink + link
 }
 
@@ -112,7 +112,7 @@ func (r *Rest) Authenticate() error {
 	if err := r.authentication.Validate(); err != nil {
 		return err
 	}
-	result, err := r.engine.PostWithHeaderNoAuth(r.authentication.ToMap(), r.getLink("/auth/token"), map[string]string{
+	result, err := r.engine.PostWithHeaderNoAuth(r.authentication.ToMap(), r.GetLink("/auth/token"), map[string]string{
 		"Accept":       "application/json",
 		"Content-Type": "application/json",
 	})
@@ -142,8 +142,8 @@ func (r *Rest) Subscribe(subscription *model.Subscription) (*response.Subscripti
 		return nil, ErrAuthenticationRequired
 	}
 	fmt.Println("Subscription: ", string(utils.MapInterfaceToBytes(subscription.ToMap())))
-	fmt.Println("Link: ", r.getLink("/api/subscription"))
-	result, err := r.engine.PostWithHeader(subscription.ToMap(), r.getLink("/api/subscription"), map[string]string{
+	fmt.Println("Link: ", r.GetLink("/api/subscription"))
+	result, err := r.engine.PostWithHeader(subscription.ToMap(), r.GetLink("/api/subscription"), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {
@@ -170,7 +170,7 @@ func (r *Rest) GetSubscription(subscriptionID string) (*model.Subscription, erro
 	if subscriptionID == "" {
 		return nil, ErrSubscriptionIDIsRequired
 	}
-	result, err := r.engine.GetWithHeader(nil, r.getLink("/api/subscription/"+subscriptionID), map[string]string{
+	result, err := r.engine.GetWithHeader(nil, r.GetLink("/api/subscription/"+subscriptionID), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {
@@ -196,7 +196,7 @@ func (r *Rest) Unsubscribe(subscriptionID string) (*response.SubscriptionDelete,
 	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.DeleteWithHeader(r.getLink("/api/subscription/"+subscriptionID), map[string]string{
+	result, err := r.engine.DeleteWithHeader(r.GetLink("/api/subscription/"+subscriptionID), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {
@@ -225,7 +225,7 @@ func (r *Rest) CreatePlan(plan *model.Plan) (*response.Plan, error) {
 	if err := plan.Validate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.PostWithHeader(plan.ToMap(), r.getLink("/api/plan"), map[string]string{
+	result, err := r.engine.PostWithHeader(plan.ToMap(), r.GetLink("/api/plan"), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {
@@ -261,7 +261,7 @@ func (r *Rest) ListPlan(page, pageSize uint16, externalID string) (*response.Pla
 	if externalID != "" {
 		params["external_reference_id"] = externalID
 	}
-	result, err := r.engine.GetWithHeader(params, r.getLink("/api/plan"), map[string]string{
+	result, err := r.engine.GetWithHeader(params, r.GetLink("/api/plan"), map[string]string{
 		"api-version": "1",
 		"Accept":      "application/json",
 	})
@@ -288,7 +288,7 @@ func (r *Rest) GetPlan(planID string) (*response.Plan, error) {
 	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.GetWithHeader(nil, r.getLink("/api/plan/"+planID), map[string]string{
+	result, err := r.engine.GetWithHeader(nil, r.GetLink("/api/plan/"+planID), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {
@@ -318,7 +318,7 @@ func (r *Rest) GetPlanByExternalID(planID string) (*response.Plan, error) {
 	mapping := map[string]interface{}{
 		"external_reference_id": planID,
 	}
-	result, err := r.engine.GetWithHeader(mapping, r.getLink("/api/plan"), map[string]string{
+	result, err := r.engine.GetWithHeader(mapping, r.GetLink("/api/plan"), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {
@@ -356,7 +356,7 @@ func (r *Rest) CreateCard(card *model.Card) (*model.Card, error) {
 	if err := card.Validate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.PostWithHeader(card.ToMap(), r.getLink("/api/card"), map[string]string{
+	result, err := r.engine.PostWithHeader(card.ToMap(), r.GetLink("/api/card"), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {
@@ -386,7 +386,7 @@ func (r *Rest) GetCard(cardID string) (*model.Card, error) {
 	if err := r.Authenticate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.GetWithHeader(nil, r.getLink("/api/card/"+cardID), map[string]string{
+	result, err := r.engine.GetWithHeader(nil, r.GetLink("/api/card/"+cardID), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {
@@ -415,7 +415,7 @@ func (r *Rest) CreateWebhook(webhook *model.Webhook) (*response.Webhook, error) 
 	if err := webhook.Validate(); err != nil {
 		return nil, err
 	}
-	result, err := r.engine.PostWithHeader(webhook.ToAPI(), r.getLink("/api/webhook"), map[string]string{
+	result, err := r.engine.PostWithHeader(webhook.ToAPI(), r.GetLink("/api/webhook"), map[string]string{
 		"api-version": "1",
 	})
 	if err != nil {

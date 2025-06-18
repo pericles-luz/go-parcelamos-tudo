@@ -30,3 +30,19 @@ func NewWebhookInvoice() *WebhookInvoice {
 func (w *WebhookInvoice) Unmarshal(data []byte) error {
 	return json.Unmarshal(data, w)
 }
+
+func (w *WebhookInvoice) IsOpened() bool {
+	return w.Event == "invoice.opened"
+}
+
+func (w *WebhookInvoice) IsChargingPix() bool {
+	return w.Event == "invoice.charge.pix"
+}
+
+func (w *WebhookInvoice) IsPaid() bool {
+	return w.Event == "invoice.paid"
+}
+
+func (w *WebhookInvoice) IsCancelled() bool {
+	return w.Event == "invoice.cancelled"
+}

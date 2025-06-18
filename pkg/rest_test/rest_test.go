@@ -269,9 +269,9 @@ func TestRestShouldCreateWebhook(t *testing.T) {
 	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"webhook.create"})
 	require.NoError(t, err, "Failed to create rest entity")
 	webhook := model.NewWebhook()
-	webhook.SetContextName("plan").
-		SetEventName("plan.created").
-		SetURL("https://example.com/plan").
+	webhook.SetContextName("invoice").
+		SetEventName("invoice.charge.pix").
+		SetURL("https://api.oopss.com.br/aberto/parcelamos/invoice/pix").
 		SetPrivateKey("private_key")
 	require.NoError(t, webhook.Validate(), "Webhook validation failed")
 	response, err := restEntity.CreateWebhook(webhook)
