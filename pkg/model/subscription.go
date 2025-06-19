@@ -63,6 +63,16 @@ func (s *Subscription) SetCustomer(customer *Customer) *Subscription {
 }
 
 func (s *Subscription) Validate() error {
+	if err := s.ValidateOnGet(); err != nil {
+		return err
+	}
+	if s.Customer == nil {
+		return ErrCustomerIsRequired
+	}
+	return nil
+}
+
+func (s *Subscription) ValidateOnGet() error {
 	if s.PlanID == "" {
 		return ErrPlanIDIsRequired
 	}
@@ -77,9 +87,6 @@ func (s *Subscription) Validate() error {
 
 	if s.StartDate == "" {
 		return ErrStartDateIsRequired
-	}
-	if s.Customer == nil {
-		return ErrCustomerIsRequired
 	}
 	return nil
 }

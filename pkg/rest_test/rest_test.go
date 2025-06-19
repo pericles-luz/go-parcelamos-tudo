@@ -181,7 +181,7 @@ func TestRestShouldSubscribeWithPixAndUnsubscribe(t *testing.T) {
 	subscription := model.NewSubscription()
 	subscription.PlanID = "pln_2wNMJaot9NT0rfbpSFqYsc1vDgm"
 	subscription.ChargeType = "pix"
-	subscription.ExternalReferenceID = uuid.NewString()
+	subscription.ExternalReferenceID = "7a7b3628-d327-43ef-9e54-edb6fc505698"
 	subscription.StartDate = time.Now().Format("2006-01-02")
 	subscription.Cycles = 0
 	customer := model.NewCustomer()
@@ -244,7 +244,7 @@ func TestRestShouldGetSubscription(t *testing.T) {
 	}
 	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.read"})
 	require.NoError(t, err, "Failed to create rest entity")
-	response, err := restEntity.GetSubscription("sub_2wlNFLfTy9gGjEgqhFEzwoQhI8n")
+	response, err := restEntity.GetSubscription("sub_2yk5gxjbvJSivJ1URPV7RPI7Hgz")
 	require.NoError(t, err, "Failed to get subscription")
 	require.NotEmpty(t, response.PlanID, "Subscription PlanID is empty")
 	t.Log("Subscription: ", response)
