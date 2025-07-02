@@ -91,6 +91,7 @@ func TestWebhookShouldUnmarshalRealInvoiceOpened(t *testing.T) {
 	require.Equal(t, "inv_2xxEeqsyEQymUsIv9TdyWQA9Qmk", entity.ID())
 	require.Equal(t, "pln_2wNMJaot9NT0rfbpSFqYsc1vDgm", invoice.PlanID)
 	require.Equal(t, "sub_2xxEet1aJBv9O6qUffSDPlRxSkT", invoice.SubscriptionID)
+	require.Equal(t, "sub_2xxEet1aJBv9O6qUffSDPlRxSkT", entity.SubscriptionID())
 	require.Equal(t, "", invoice.CardID)
 	require.Equal(t, "open", invoice.Status)
 	require.Equal(t, "2025-06-02T00:00:00Z", invoice.ReferenceDate)

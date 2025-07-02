@@ -58,3 +58,7 @@ func (w *WebhookInvoice) ID() string {
 func (w *WebhookInvoice) PaymentDate() string {
 	return w.Data.ReferenceDate
 }
+
+func (w *WebhookInvoice) SubscriptionID() string {
+	return w.Data.SubscriptionID
+}
