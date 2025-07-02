@@ -181,7 +181,7 @@ func TestRestShouldSubscribeWithPixAndUnsubscribe(t *testing.T) {
 	subscription := model.NewSubscription()
 	subscription.PlanID = "pln_2wNMJaot9NT0rfbpSFqYsc1vDgm"
 	subscription.ChargeType = "pix"
-	subscription.ExternalReferenceID = "7a7b3628-d327-43ef-9e54-edb6fc505698"
+	subscription.ExternalReferenceID = "7fa01cf3-acf8-41ff-b1e6-b9175704918a"
 	subscription.StartDate = time.Now().Format("2006-01-02")
 	subscription.Cycles = 0
 	customer := model.NewCustomer()
@@ -242,9 +242,9 @@ func TestRestShouldGetSubscription(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"subscription.read"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/prod.json", []string{"subscription.read"})
 	require.NoError(t, err, "Failed to create rest entity")
-	response, err := restEntity.GetSubscription("sub_2yk5gxjbvJSivJ1URPV7RPI7Hgz")
+	response, err := restEntity.GetSubscription("sub_2yue5FYuJnJzDLjfbePSZylrRFI")
 	require.NoError(t, err, "Failed to get subscription")
 	require.NotEmpty(t, response.PlanID, "Subscription PlanID is empty")
 	t.Log("Subscription: ", response)
@@ -266,13 +266,13 @@ func TestRestShouldCreateWebhook(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "yes" {
 		t.Skip("Skip test in GitHub Actions")
 	}
-	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/sandbox.json", []string{"webhook.create"})
+	restEntity, err := factory_client.NewClient(utils.GetBaseDirectory("config")+"/prod.json", []string{"webhook.create"})
 	require.NoError(t, err, "Failed to create rest entity")
 	webhook := model.NewWebhook()
 	webhook.SetContextName("invoice").
-		SetEventName("invoice.charge.pix").
-		SetURL("https://api.oopss.com.br/aberto/parcelamos/invoice/pix").
-		SetPrivateKey("private_key")
+		SetEventName("invoice.duedated").
+		SetURL("https://api.oopss.com.br/aberto/parcelamos/invoice/duedated").
+		SetPrivateKey("0EfTju7ygfh")
 	require.NoError(t, webhook.Validate(), "Webhook validation failed")
 	response, err := restEntity.CreateWebhook(webhook)
 	require.NoError(t, err, "Failed to create webhook")

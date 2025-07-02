@@ -88,13 +88,16 @@ func TestWebhookShouldUnmarshalRealInvoiceOpened(t *testing.T) {
 
 	invoice := entity.Data
 	require.Equal(t, "inv_2xxEeqsyEQymUsIv9TdyWQA9Qmk", invoice.ID)
+	require.Equal(t, "inv_2xxEeqsyEQymUsIv9TdyWQA9Qmk", entity.ID())
 	require.Equal(t, "pln_2wNMJaot9NT0rfbpSFqYsc1vDgm", invoice.PlanID)
 	require.Equal(t, "sub_2xxEet1aJBv9O6qUffSDPlRxSkT", invoice.SubscriptionID)
 	require.Equal(t, "", invoice.CardID)
 	require.Equal(t, "open", invoice.Status)
 	require.Equal(t, "2025-06-02T00:00:00Z", invoice.ReferenceDate)
+	require.Equal(t, "2025-06-02T00:00:00Z", entity.PaymentDate())
 	require.Equal(t, 0, invoice.ChargeIntent)
 	require.Equal(t, 100, invoice.Amount)
+	require.Equal(t, 100, entity.Amount())
 	require.Equal(t, "BRL", invoice.Currency)
 	require.Equal(t, "2025-06-02T13:37:02.879884Z", invoice.CreatedAt)
 	require.Equal(t, "2025-06-02T13:37:02.907125995Z", invoice.UpdatedAt)

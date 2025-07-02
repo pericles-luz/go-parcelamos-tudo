@@ -46,3 +46,15 @@ func (w *WebhookInvoice) IsPaid() bool {
 func (w *WebhookInvoice) IsCancelled() bool {
 	return w.Event == "invoice.cancelled"
 }
+
+func (w *WebhookInvoice) Amount() int {
+	return w.Data.Amount
+}
+
+func (w *WebhookInvoice) ID() string {
+	return w.Data.ID
+}
+
+func (w *WebhookInvoice) PaymentDate() string {
+	return w.Data.ReferenceDate
+}
